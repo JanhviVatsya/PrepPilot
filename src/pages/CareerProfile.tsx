@@ -8,11 +8,17 @@ import {
   Sparkles,
 } from 'lucide-react'
 
+import AIChatPage from './career-profile/AIChatPage'
+import ResumeUploadPage from './career-profile/ResumeUploadPage'
+import ManualEntryPage from './career-profile/ManualEntryPage'
+
 type EntryMethod = 'chat' | 'resume' | 'manual'
 
 export default function CareerProfile() {
   const [selectedMethod, setSelectedMethod] =
     useState<EntryMethod | null>(null)
+
+const [currentStep, setCurrentStep] = useState<EntryMethod | null>(null)
 
   const entryOptions = [
     {
@@ -42,11 +48,21 @@ export default function CareerProfile() {
   ]
 
   function handleContinue() {
-    if (!selectedMethod) return
+  if (!selectedMethod) return
+  setCurrentStep(selectedMethod)
+}
 
-    // The next step for each entry method will be implemented separately.
-    console.log('Selected career profile method:', selectedMethod)
-  }
+if (currentStep === 'chat') {
+  return <AIChatPage onBack={() => setCurrentStep(null)} />
+}
+if (currentStep === 'resume') {
+  return <ResumeUploadPage onBack={() => setCurrentStep(null)} />
+}
+// if (currentStep === 'resume') return <ResumeUploadPage />
+if (currentStep === 'manual') {
+  return <ManualEntryPage onBack={() => setCurrentStep(null)} />
+}
+// if (currentStep === 'manual') return <ManualEntryPage />
 
   return (
     <section className="mx-auto max-w-4xl py-4 sm:py-8">
