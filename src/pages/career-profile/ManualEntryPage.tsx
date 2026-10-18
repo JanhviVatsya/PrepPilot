@@ -1,16 +1,18 @@
 
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
   BriefcaseBusiness,
   Target,
   Clock3,
-  CheckCircle2,
 } from 'lucide-react'
+import type { CareerProfileData } from './types'
 
 type ManualEntryPageProps = {
   onBack: () => void
+  onReview: (profile: CareerProfileData) => void
+  initialData: CareerProfileData
 }
 
 type CareerForm = {
@@ -23,47 +25,40 @@ type CareerForm = {
   weeklyHours: string
 }
 
-const initialForm: CareerForm = {
-  currentRole: '',
-  experience: '',
-  currentSkills: '',
-  targetRole: '',
-  careerGoal: '',
-  targetTimeline: '',
-  weeklyHours: '',
-}
-
-export default function ManualEntryPage({ onBack }: ManualEntryPageProps) {
-  const [form, setForm] = useState<CareerForm>(initialForm)
+export default function ManualEntryPage({
+  onBack,
+  onReview,
+  initialData,
+}: ManualEntryPageProps) {
+  const [form, setForm] = useState<CareerForm>(initialData)
   const [errors, setErrors] = useState<string[]>([])
-  const [submitted, setSubmitted] = useState(false)
+  // const [submitted, setSubmitted] = useState(false)
 
   function updateField(field: keyof CareerForm, value: string) {
     setForm((previous) => ({ ...previous, [field]: value }))
-    setSubmitted(false)
+    // setSubmitted(false)
     setErrors([])
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
 
-    const missing: string[] = []
+function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault()
 
-    if (!form.currentRole.trim()) missing.push('Current role')
-    if (!form.targetRole.trim()) missing.push('Target role')
-    if (!form.careerGoal) missing.push('Career goal')
+  const missing: string[] = []
 
-    if (missing.length > 0) {
-      setErrors(missing)
-      setSubmitted(false)
-      return
-    }
+  if (!form.currentRole.trim()) missing.push('Current role')
+  if (!form.targetRole.trim()) missing.push('Target role')
+  if (!form.careerGoal) missing.push('Career goal')
 
-    setErrors([])
-    setSubmitted(true)
-
-    // Persistence and profile review will be implemented with the backend.
+  if (missing.length > 0) {
+    setErrors(missing)
+    return
   }
+
+  setErrors([])
+  onReview(form)
+}
+
 
   const inputClass =
     'mt-2 w-full rounded-lg border border-[#353A35] bg-[#111311] px-3 py-3 text-sm text-[#E5E7E5] outline-none transition-colors placeholder:text-[#777D77] focus:border-[#00E676]'
@@ -246,22 +241,6 @@ export default function ManualEntryPage({ onBack }: ManualEntryPageProps) {
             className="rounded-lg border border-red-900/60 bg-red-950/20 p-4 text-sm text-red-300"
           >
             Please complete these required fields: {errors.join(', ')}.
-          </div>
-        )}
-
-        {submitted && (
-          <div
-            role="status"
-            className="flex items-start gap-3 rounded-xl border border-[#285238] bg-[#142019] p-4"
-          >
-            <CheckCircle2 size={20} className="mt-0.5 shrink-0 text-[#00E676]" />
-            <div>
-              <p className="text-sm font-semibold">Form validated successfully</p>
-              <p className="mt-1 text-sm leading-6 text-[#A1A7A1]">
-                Your information is currently held in this page's state only.
-                Saving and profile review will be added later.
-              </p>
-            </div>
           </div>
         )}
 

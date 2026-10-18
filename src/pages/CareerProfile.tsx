@@ -11,14 +11,28 @@ import {
 import AIChatPage from './career-profile/AIChatPage'
 import ResumeUploadPage from './career-profile/ResumeUploadPage'
 import ManualEntryPage from './career-profile/ManualEntryPage'
+import ProfileReviewPage from './career-profile/ProfileReviewPage'
+import type { CareerProfileData } from './career-profile/types'
 
 type EntryMethod = 'chat' | 'resume' | 'manual'
+type CareerProfileStep = EntryMethod | 'review'
 
 export default function CareerProfile() {
-  const [selectedMethod, setSelectedMethod] =
-    useState<EntryMethod | null>(null)
+const [selectedMethod, setSelectedMethod] =
+  useState<EntryMethod | null>(null)
 
-const [currentStep, setCurrentStep] = useState<EntryMethod | null>(null)
+const [currentStep, setCurrentStep] =
+  useState<CareerProfileStep | null>(null)
+
+const [profile, setProfile] = useState<CareerProfileData>({
+  currentRole: '',
+  experience: '',
+  currentSkills: '',
+  targetRole: '',
+  careerGoal: '',
+  targetTimeline: '',
+  weeklyHours: '',
+})
 
   const entryOptions = [
     {
@@ -58,11 +72,26 @@ if (currentStep === 'chat') {
 if (currentStep === 'resume') {
   return <ResumeUploadPage onBack={() => setCurrentStep(null)} />
 }
-// if (currentStep === 'resume') return <ResumeUploadPage />
 if (currentStep === 'manual') {
-  return <ManualEntryPage onBack={() => setCurrentStep(null)} />
+  return (
+    <ManualEntryPage
+      initialData={profile}
+      onBack={() => setCurrentStep(null)}
+      onReview={(submittedProfile) => {
+        setProfile(submittedProfile)
+        setCurrentStep('review')
+      }}
+    />
+  )
 }
-// if (currentStep === 'manual') return <ManualEntryPage />
+if (currentStep === 'review') {
+  return (
+    <ProfileReviewPage
+      profile={profile}
+      onBackToEdit={() => setCurrentStep('manual')}
+    />
+  )
+}
 
   return (
     <section className="mx-auto max-w-4xl py-4 sm:py-8">
