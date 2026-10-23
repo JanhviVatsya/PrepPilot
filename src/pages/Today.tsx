@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CheckCircle2, Clock3, Flame } from 'lucide-react'
 
 const tasks = [
@@ -17,8 +17,22 @@ const tasks = [
 ]
 
 export default function Today() {
-  const [completed, setCompleted] = useState<number[]>([])
-  const progress = Math.round((completed.length / tasks.length) * 100)
+  const todayKey = `preppilot-tasks-${new Date().toLocaleDateString('en-CA')}`
+
+const [completed, setCompleted] = useState<number[]>(() => {
+  try {
+    const saved = localStorage.getItem(todayKey)
+    return saved ? (JSON.parse(saved) as number[]) : []
+  } catch {
+    return []
+  }
+})
+
+useEffect(() => {
+  localStorage.setItem(todayKey, JSON.stringify(completed))
+}, [todayKey, completed])
+
+const progress = Math.round((completed.length / tasks.length) * 100)
 
   return (
     <div className="space-y-7">
